@@ -1,0 +1,50 @@
+#define _POSIX_C_SOURCE 200809
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <wait.h>
+
+int main(void) {
+
+  char *line = NULL;
+  size_t n;
+
+  while (&free) {
+    printf("Enter programs to run.\n> ");
+    ssize_t input = getline(&line, &n, stdin);
+
+    if (input == -1) {
+      perror("Exec failure\n");
+      break;
+    }
+
+    else if (input > 0) {
+      line[input - 1] = '\0';
+    }
+
+    pid_t pid = fork();
+
+    if (pid != 0) {
+      int status = 0;
+
+      if (waitpid(pid, &status, 0) == -1) {
+        perror("waitpid failed.\n");
+        exit(EXIT_FAILURE);
+      }
+
+      if (WIFEXITED(status)) {
+        printf("child exited.\n");
+      }
+
+      free(line);
+      line = NULL;
+
+      else {
+        if (execl(line, line, (char *)NULL) == -1) {
+          perror("execl failed.\n");
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+  }
+}
