@@ -1,0 +1,80 @@
+#define _POSIX_C_SOURCE 200809L
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LEN 5
+
+char *get_input();
+void add_to_history(char *input);
+void remove_oldest_record();
+void print_history();
+
+char *input_history[MAX_LEN];
+int history_count = 0;
+
+int main(void) {
+  // keep looping for get_input
+  while (1) {
+    char *input = get_input();
+    // add input to history
+    add_to_history(input);
+
+    // if "print", print history
+    if (strcmp(input, "print") == 0) {
+      print_history();
+    }
+  }
+  // free memory if while loop ends
+  free(input_history);
+  return 0;
+}
+
+char *get_input() {
+  // setup for getline()
+  char *buffer = NULL;
+  size_t buffsize = 0;
+  printf("Enter input: ");
+  // store stdin into buffer
+  size_t len = getline(&buffer, &buffsize, stdin);
+
+  // if failed to get line, exit
+  if (len == -1) {
+    exit(1);
+  }
+  // else, replace \n with NULL byte + return input
+  buffer[len - 1] = '\0';
+  return buffer;
+}
+
+void add_to_history(char *input) {
+  // check if full, if so, remove oldest input
+  if (history_count >= MAX_LEN) {
+    remove_oldest_record();
+  }
+  // at history_count, add new input (count = 4, arr[4] = input, count =
+  // MAX_LEN)
+  input_history[history_count] = input;
+  history_count++;
+}
+
+void remove_oldest_record() {
+  // check there are records to remove
+  if (history_count > 0) {
+    // free oldest input (0)
+    free(input_history[0]);
+
+    // shift all previous input down (arr[0] = arr[1], arr[1] = arr[2]...)
+    for (int i = 1; i < history_count; i++) {
+      input_history[i - 1] = input_history[i];
+    }
+    // update count from removing oldest input
+    history_count--;
+  }
+}
+
+void print_history() {
+  for (int i = 0; i < history_count; i++) {
+    printf("%s\n", input_history[i]);
+  }
+}
