@@ -39,18 +39,16 @@ void *handle_client(void *arg) {
 
   // TODO: print the message received from client
   while ((num_read = read(client->cfd, buf, BUF_SIZE)) > 0) {
-
+    
     pthread_mutex_lock(&count_mutex);
     // TODO: increase total_message_count per message
     total_message_count++;
 
-    printf("Msg # %3d; Client %d: %.*s", total_message_count, client->client_id,
-           (int)num_read, buf);
+    printf("Msg # %3d; Client %d: %.*s", total_message_count, client->client_id, (int)num_read, buf);
 
     pthread_mutex_unlock(&count_mutex);
-  }
 
-  printf("Ending thread for client %d\n", client->client_id);
+  }
 
   return NULL;
 }
@@ -96,8 +94,7 @@ int main() {
     client_id_counter++;
     pthread_mutex_unlock(&client_id_mutex);
 
-    printf("New client Created! ID %d on socket FD %d\n", info->client_id,
-           info->cfd);
+    printf("New client Created! ID %d on socket FD %d\n", info->client_id, info->cfd);
 
     // TODO: call handle_client() when launching a new thread, and provide
     // client_info
